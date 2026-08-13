@@ -577,7 +577,13 @@ const PITCH_NAMES = {
 const PITCH_COLORS = ['#FFC72C','#4FA8E0','#FF7A59','#00857A','#B98CE0','#7FD858','#E05C8A','#9A9483'];
 
 function pitchColor(name, order){ return PITCH_COLORS[order.indexOf(name) % PITCH_COLORS.length]; }
-function pitchLabel(row){ return row.pitch_name || PITCH_NAMES[row.pitch_type] || row.pitch_type || 'Unknown'; }
+function pitchLabel(row){
+  // Prefer the canonical name derived from pitch_type CODE over the raw
+  // free-text name, since MLB's live feed and Savant phrase some pitch names
+  // differently ("Four-Seam Fastball" vs "4-Seam Fastball") for the same code.
+  if(row.pitch_type && PITCH_NAMES[row.pitch_type]) return PITCH_NAMES[row.pitch_type];
+  return row.pitch_name || row.pitch_type || 'Unknown';
+}
 function headshotUrl(id){ return `https://img.mlbstatic.com/mlb-photos/image/upload/w_120,q_auto:best,f_jpg/v1/people/${id}/headshot/67/current`; }
 function initials(name){ return (name||'?').split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase(); }
 
